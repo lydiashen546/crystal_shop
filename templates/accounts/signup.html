@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up | Moonlit Crystals{% endblock %}
+
+{% block content %}
+<section class="panel" style="max-width:560px;margin:24px auto;">
+  <h1 style="margin-top:0;">Sign up</h1>
+  <p class="muted">Use the same email from guest checkout to see those orders after signup.</p>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-grid">
+      <div><label>First name</label><input name="first_name" required></div>
+      <div><label>Last name</label><input name="last_name" required></div>
+      <div><label>Email</label><input name="user_email" type="email" required></div>
+      <div><label>Phone</label><input name="phone" required></div>
+    </div>
+    <label>Password</label>
+    <input name="user_password" type="password" required>
+    <p><button class="primary" type="submit">Create account</button></p>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout | Moonlit Crystals{% endblock %}
+
+{% block content %}
+<h1>Checkout</h1>
+<section class="panel">
+  <p class="price">Total: ${{ total }}</p>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-grid">
+      <div><label>First name</label><input name="first_name" required value="{{ checkout_first_name }}"></div>
+      <div><label>Last name</label><input name="last_name" required value="{{ checkout_last_name }}"></div>
+      <div><label>Email</label><input name="user_email" type="email" required value="{% if current_shop_user %}{{ current_shop_user.user_email }}{% else %}guest@example.com{% endif %}"></div>
+      <div><label>Phone</label><input name="phone" required value="{% if current_shop_user %}{{ current_shop_user.phone }}{% else %}312-555-0100{% endif %}"></div>
+      <div><label>Country</label><input name="country" required value="USA"></div>
+      <div><label>State</label><input name="state" required value="IL"></div>
+      <div><label>City</label><input name="city" required value="Chicago"></div>
+      <div><label>Postal code</label><input name="postal_code" required value="60601"></div>
+    </div>
+    <label>Street</label><input name="street" required value="200 Quartz Ave">
+    <label>Payment method</label>
+    <select name="payment_method" required>
+      <option value="card">Card</option>
+      <option value="paypal">PayPal</option>
+      <option value="apple_pay">Apple Pay</option>
+    </select>
+    <p><button class="primary" type="submit">Place order</button></p>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Cart | Moonlit Crystals{% endblock %}
+
+{% block content %}
+<h1>Cart</h1>
+{% if lines %}
+  <table>
+    <tr><th>Product</th><th>Quantity</th><th>Line total</th><th></th></tr>
+    {% for line in lines %}
+      <tr>
+        <td><a href="{% url 'product_detail' line.product.product_id %}">{{ line.product.product_name }}</a></td>
+        <td>{{ line.quantity }}</td>
+        <td>${{ line.line_total }}</td>
+        <td>
+          <form method="post" action="{% url 'remove_from_cart' line.product.product_id %}">
+            {% csrf_token %}
+            <button type="submit">Remove</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    <tr><th colspan="2">Total</th><th>${{ total }}</th><th></th></tr>
+  </table>
+  <p><a class="button primary" href="{% url 'checkout' %}">Checkout</a></p>
+{% else %}
+  <p class="muted">Your cart is empty.</p>
+  <p><a class="button primary" href="{% url 'index' %}">Shop products</a></p>
+{% endif %}
+{% endblock %}

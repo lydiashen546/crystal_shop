@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Products | Moonlit Crystals{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div>
+    <h1>Moonlit Crystals</h1>
+    <p>A modern crystal shop focused on healing stones, spiritual tools, and calming energy.</p>
+    <a class="button primary" href="#products">Browse products</a>
+  </div>
+  <img src="https://cdn.shopify.com/s/files/1/2508/2556/files/gemstone_cover_photo_2048x.jpg?v=1599096179" alt="Crystal display">
+</section>
+
+<form class="searchbar" method="get" action="{% url 'index' %}">
+  {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+  <input name="q" type="search" placeholder="Search products" value="{{ query }}">
+  <button class="primary" type="submit">Search</button>
+  {% if query %}<a class="button" href="{% url 'index' %}">Clear</a>{% endif %}
+</form>
+
+<div class="toolbar">
+  <a class="chip" href="{% url 'index' %}{% if query %}?q={{ query|urlencode }}{% endif %}">All</a>
+  {% for category in categories %}
+    <a class="chip" href="{% url 'index' %}?category={{ category.category_id }}{% if query %}&q={{ query|urlencode }}{% endif %}">{{ category.category }}</a>
+  {% endfor %}
+</div>
+
+<section id="products" class="grid">
+  {% for product in products %}
+    <article class="card">
+      <a href="{% url 'product_detail' product.product_id %}">
+        <img src="{{ product.main_image }}" alt="{{ product.product_name }}">
+      </a>
+      <div class="card-body">
+        <div class="muted">{{ product.category.category }}</div>
+        <h2 style="font-size:20px;margin:6px 0 4px;">
+          <a href="{% url 'product_detail' product.product_id %}">{{ product.product_name }}</a>
+        </h2>
+        <p class="muted">{{ product.description }}</p>
+        <div class="price">${{ product.price }}</div>
+        <form method="post" action="{% url 'add_to_cart' product.product_id %}">
+          {% csrf_token %}
+          <button class="primary" type="submit">Add to cart</button>
+        </form>
+      </div>
+    </article>
+  {% empty %}
+    <p>No active products found.</p>
+  {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.product_name }} | Moonlit Crystals{% endblock %}
+
+{% block content %}
+<section class="detail">
+  <div>
+    <div class="carousel" data-carousel>
+      <img class="carousel-image" data-carousel-image src="{% if product_images %}{{ product_images.0.image_url }}{% else %}{{ product.main_image }}{% endif %}" alt="{{ product.product_name }}">
+      <button class="carousel-button prev" type="button" data-carousel-prev aria-label="Previous image">&lt;</button>
+      <button class="carousel-button next" type="button" data-carousel-next aria-label="Next image">&gt;</button>
+      <span class="carousel-count" data-carousel-count>1 / {% if product_images %}{{ product_images|length }}{% else %}1{% endif %}</span>
+    </div>
+    <div class="thumbs">
+      {% for image in product_images %}
+        <button type="button" data-carousel-thumb data-src="{{ image.image_url }}" data-alt="{{ product.product_name }} image {{ forloop.counter }}">
+          <img src="{{ image.image_url }}" alt="{{ product.product_name }} image {{ forloop.counter }}">
+        </button>
+      {% empty %}
+        <button type="button" data-carousel-thumb data-src="{{ product.main_image }}" data-alt="{{ product.product_name }}">
+          <img src="{{ product.main_image }}" alt="{{ product.product_name }}">
+        </button>
+      {% endfor %}
+    </div>
+  </div>
+  <div>
+    <div class="muted">{{ product.category.category }}</div>
+    <h1 style="font-size:38px;margin:6px 0 8px;">{{ product.product_name }}</h1>
+    <div class="price">${{ product.price }}</div>
+    <p>{{ product.description }}</p>
+    <p class="muted">Stock: {{ product.stock_quantity }}{% if avg_rating %} | Average rating: {{ avg_rating|floatformat:1 }}/5{% endif %}</p>
+    <form method="post" action="{% url 'add_to_cart' product.product_id %}">
+      {% csrf_token %}
+      <label for="quantity">Quantity</label>
+      <input id="quantity" name="quantity" type="number" min="1" max="{{ product.stock_quantity }}" value="1">
+      <p><button class="primary" type="submit">Add to cart</button></p>
+    </form>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll("[data-carousel]").forEach((carousel) => {
+    const image = carousel.querySelector("[data-carousel-image]");
+    const count = carousel.querySelector("[data-carousel-count]");
+    const thumbs = Array.from(carousel.parentElement.querySelectorAll("[data-carousel-thumb]"));
+    let index = 0;
+
+    function show(nextIndex) {
+      if (!thumbs.length) return;
+      index = (nextIndex + thumbs.length) % thumbs.length;
+      image.src = thumbs[index].dataset.src;
+      image.alt = thumbs[index].dataset.alt;
+      count.textContent = `${index + 1} / ${thumbs.length}`;
+    }
+
+    carousel.querySelector("[data-carousel-prev]").addEventListener("click", () => show(index - 1));
+    carousel.querySelector("[data-carousel-next]").addEventListener("click", () => show(index + 1));
+    thumbs.forEach((thumb, thumbIndex) => thumb.addEventListener("click", () => show(thumbIndex)));
+    show(0);
+  });
+</script>
+
+<section class="panel">
+  <h2>Crystal profile</h2>
+  {% for profile in crystal_profiles %}
+    <h3>{{ profile.crystal.crystal_name }}</h3>
+    <p>{{ profile.crystal.description }}</p>
+    <p class="muted">Hardness: {{ profile.crystal.hardness }} | Origin: {{ profile.crystal.origin }}</p>
+    <p><strong>Care:</strong> {{ profile.crystal.care_instruction }}</p>
+    {% for section in profile.sections %}
+      <p><strong>{{ section.title }}:</strong> {{ section.content }}</p>
+    {% endfor %}
+  {% empty %}
+    <p class="muted">No crystal profile linked yet.</p>
+  {% endfor %}
+</section>
+
+<section class="panel">
+  <h2>Reviews</h2>
+  {% for review in reviews %}
+    <p><strong>{{ review.user.user_name }}</strong> rated {{ review.rate }}/5</p>
+    <p>{{ review.comment }}</p>
+  {% empty %}
+    <p class="muted">No reviews yet.</p>
+  {% endfor %}
+</section>
+{% endblock %}

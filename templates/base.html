@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Moonlit Crystals{% endblock %}</title>
+  <style>
+    :root { color-scheme: light; --ink:#25211d; --muted:#6f675f; --line:#ddd5cd; --accent:#0f766e; --soft:#fffaf5; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Arial, Helvetica, sans-serif; color:var(--ink); background:var(--soft); }
+    a { color:inherit; text-decoration:none; }
+    header { border-bottom:1px solid var(--line); background:#fff; position:sticky; top:0; z-index:3; }
+    nav { max-width:1120px; margin:auto; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { font-weight:800; font-size:20px; }
+    .navlinks { display:flex; gap:14px; align-items:center; color:var(--muted); font-size:14px; flex-wrap:wrap; }
+    main { max-width:1120px; margin:auto; padding:28px 20px 56px; }
+    .hero { display:grid; grid-template-columns:1.1fr .9fr; gap:28px; align-items:center; padding:28px 0 34px; }
+    .hero h1 { font-size:46px; line-height:1.02; margin:0 0 14px; letter-spacing:0; }
+    .hero p { color:var(--muted); font-size:17px; line-height:1.55; margin:0 0 20px; max-width:620px; }
+    .hero img { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:8px; }
+    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 24px; }
+    .searchbar { display:flex; gap:10px; align-items:center; margin:12px 0 18px; }
+    .searchbar input { min-width:220px; }
+    .chip, button, .button { border:1px solid var(--line); background:#fff; border-radius:8px; padding:10px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-weight:700; }
+    .button.primary, button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:18px; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+    .card img { width:100%; aspect-ratio:4/3; object-fit:cover; display:block; }
+    .card-body { padding:14px; }
+    .muted { color:var(--muted); }
+    .price { font-size:20px; font-weight:800; margin:8px 0; }
+    .detail { display:grid; grid-template-columns:minmax(280px,.9fr) 1.1fr; gap:28px; align-items:start; }
+    .detail img { width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px; border:1px solid var(--line); }
+    .carousel { position:relative; }
+    .carousel-image { width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px; border:1px solid var(--line); display:block; }
+    .carousel-button { position:absolute; top:50%; transform:translateY(-50%); width:42px; height:42px; justify-content:center; padding:0; background:rgba(255,255,255,.88); }
+    .carousel-button.prev { left:10px; }
+    .carousel-button.next { right:10px; }
+    .carousel-count { position:absolute; right:10px; bottom:10px; background:rgba(37,33,29,.78); color:#fff; border-radius:8px; padding:6px 9px; font-size:13px; }
+    .thumbs { display:grid; grid-template-columns:repeat(auto-fill, minmax(58px, 1fr)); gap:8px; margin-top:10px; }
+    .thumbs button { padding:0; border-radius:8px; overflow:hidden; aspect-ratio:1/1; }
+    .thumbs img { width:100%; height:100%; object-fit:cover; display:block; border:0; border-radius:0; }
+    .panel { background:#fff; border:1px solid var(--line); border-radius:8px; padding:18px; margin-bottom:18px; }
+    table { width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); }
+    th, td { padding:12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    input, select, textarea { width:100%; border:1px solid var(--line); border-radius:8px; padding:10px; font:inherit; background:#fff; }
+    label { display:block; font-weight:700; margin:12px 0 6px; }
+    .form-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
+    .messages { margin:0 0 18px; padding:0; list-style:none; }
+    .messages li { background:#e9f7f5; border:1px solid #b7dfd9; padding:10px 12px; border-radius:8px; margin-bottom:8px; }
+    @media (max-width: 760px) {
+      .hero, .detail, .form-grid { grid-template-columns:1fr; }
+      .hero h1 { font-size:34px; }
+      nav { align-items:flex-start; flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a class="brand" href="{% url 'index' %}">Moonlit Crystals</a>
+      <div class="navlinks">
+        <a href="{% url 'index' %}">Products</a>
+        <a href="{% url 'crystals' %}">Crystals</a>
+        <a href="{% url 'orders' %}">Orders</a>
+        <a class="button" href="{% url 'cart' %}">Cart ({{ cart_count }})</a>
+        {% if current_shop_user %}
+          <span>{{ current_shop_user.user_name }}</span>
+          <form method="post" action="{% url 'logout' %}" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+          </form>
+        {% else %}
+          <a class="button" href="{% url 'login' %}">Login</a>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+  <main>
+    {% if messages %}
+      <ul class="messages">{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

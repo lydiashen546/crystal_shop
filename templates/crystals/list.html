@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Crystals | Moonlit Crystals{% endblock %}
+
+{% block content %}
+<h1>Crystals</h1>
+
+<form class="searchbar" method="get" action="{% url 'crystals' %}">
+  {% if selected_effect %}<input type="hidden" name="effect" value="{{ selected_effect }}">{% endif %}
+  <input name="q" type="search" placeholder="Search crystals" value="{{ query }}">
+  <button class="primary" type="submit">Search</button>
+  {% if query or selected_effect %}<a class="button" href="{% url 'crystals' %}">Clear</a>{% endif %}
+</form>
+
+<div class="toolbar">
+  <a class="chip" href="{% url 'crystals' %}{% if query %}?q={{ query|urlencode }}{% endif %}">All effects</a>
+  {% for effect in effects %}
+    <a class="chip" href="{% url 'crystals' %}?effect={{ effect.id }}{% if query %}&q={{ query|urlencode }}{% endif %}">{{ effect.name }}</a>
+  {% endfor %}
+</div>
+
+{% for group in effect_groups %}
+  <section class="panel">
+    <h2>{{ group.effect.name }}</h2>
+    <p class="muted">{{ group.effect.description }}</p>
+    <section class="grid">
+      {% for crystal in group.crystals %}
+        <article class="card">
+          <a href="{% url 'crystal_detail' crystal.id %}">
+            <img src="{{ crystal.main_image }}" alt="{{ crystal.crystal_name }}">
+          </a>
+          <div class="card-body">
+            <h3 style="font-size:20px;margin:0 0 6px;">
+              <a href="{% url 'crystal_detail' crystal.id %}">{{ crystal.crystal_name }}</a>
+            </h3>
+            <p>{{ crystal.description }}</p>
+            <p class="muted">{{ crystal.hardness }} | {{ crystal.origin }}</p>
+            <a class="button" href="{% url 'crystal_detail' crystal.id %}">Details</a>
+          </div>
+        </article>
+      {% endfor %}
+    </section>
+  </section>
+{% empty %}
+  <p>No crystals found.</p>
+{% endfor %}
+
+{% if unclassified %}
+  <section class="panel">
+    <h2>Unclassified</h2>
+    <section class="grid">
+      {% for crystal in unclassified %}
+        <article class="card">
+          <a href="{% url 'crystal_detail' crystal.id %}">
+            <img src="{{ crystal.main_image }}" alt="{{ crystal.crystal_name }}">
+          </a>
+          <div class="card-body">
+            <h3 style="font-size:20px;margin:0 0 6px;">
+              <a href="{% url 'crystal_detail' crystal.id %}">{{ crystal.crystal_name }}</a>
+            </h3>
+            <p>{{ crystal.description }}</p>
+            <p class="muted">{{ crystal.hardness }} | {{ crystal.origin }}</p>
+            <a class="button" href="{% url 'crystal_detail' crystal.id %}">Details</a>
+          </div>
+        </article>
+      {% endfor %}
+    </section>
+  </section>
+{% endif %}
+{% endblock %}

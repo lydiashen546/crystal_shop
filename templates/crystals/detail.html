@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ crystal.crystal_name }} | Moonlit Crystals{% endblock %}
+
+{% block content %}
+<section class="detail">
+  <div>
+    <div class="carousel" data-carousel>
+      <img class="carousel-image" data-carousel-image src="{% if crystal_images %}{{ crystal_images.0.image_url }}{% else %}{{ crystal.main_image }}{% endif %}" alt="{{ crystal.crystal_name }}">
+      <button class="carousel-button prev" type="button" data-carousel-prev aria-label="Previous image">&lt;</button>
+      <button class="carousel-button next" type="button" data-carousel-next aria-label="Next image">&gt;</button>
+      <span class="carousel-count" data-carousel-count>1 / {% if crystal_images %}{{ crystal_images|length }}{% else %}1{% endif %}</span>
+    </div>
+    <div class="thumbs">
+      {% for image in crystal_images %}
+        <button type="button" data-carousel-thumb data-src="{{ image.image_url }}" data-alt="{{ crystal.crystal_name }} image {{ forloop.counter }}">
+          <img src="{{ image.image_url }}" alt="{{ crystal.crystal_name }} image {{ forloop.counter }}">
+        </button>
+      {% empty %}
+        <button type="button" data-carousel-thumb data-src="{{ crystal.main_image }}" data-alt="{{ crystal.crystal_name }}">
+          <img src="{{ crystal.main_image }}" alt="{{ crystal.crystal_name }}">
+        </button>
+      {% endfor %}
+    </div>
+  </div>
+  <div>
+    <div class="muted">Crystal Details</div>
+    <h1 style="font-size:38px;margin:6px 0 8px;">{{ crystal.crystal_name }}</h1>
+    <p>{{ crystal.description }}</p>
+    <p class="muted">Hardness: {{ crystal.hardness }} | Origin: {{ crystal.origin }}</p>
+    <section class="panel">
+      <h2>Care instruction</h2>
+      <p>{{ crystal.care_instruction }}</p>
+    </section>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll("[data-carousel]").forEach((carousel) => {
+    const image = carousel.querySelector("[data-carousel-image]");
+    const count = carousel.querySelector("[data-carousel-count]");
+    const thumbs = Array.from(carousel.parentElement.querySelectorAll("[data-carousel-thumb]"));
+    let index = 0;
+
+    function show(nextIndex) {
+      if (!thumbs.length) return;
+      index = (nextIndex + thumbs.length) % thumbs.length;
+      image.src = thumbs[index].dataset.src;
+      image.alt = thumbs[index].dataset.alt;
+      count.textContent = `${index + 1} / ${thumbs.length}`;
+    }
+
+    carousel.querySelector("[data-carousel-prev]").addEventListener("click", () => show(index - 1));
+    carousel.querySelector("[data-carousel-next]").addEventListener("click", () => show(index + 1));
+    thumbs.forEach((thumb, thumbIndex) => thumb.addEventListener("click", () => show(thumbIndex)));
+    show(0);
+  });
+</script>
+
+<section class="panel">
+  <h2>Effects</h2>
+  {% for relation in effect_relations %}
+    <p><strong>{{ relation.crystal_effect.name }}:</strong> {{ relation.crystal_effect.description }}</p>
+  {% empty %}
+    <p class="muted">No effects linked yet.</p>
+  {% endfor %}
+</section>
+
+<section class="panel">
+  <h2>Content sections</h2>
+  {% for section in crystal.content_sections.all %}
+    <p><strong>{{ section.title }}:</strong> {{ section.content }}</p>
+  {% empty %}
+    <p class="muted">No content sections yet.</p>
+  {% endfor %}
+</section>
+
+<section class="panel">
+  <h2>Related products</h2>
+  {% if related_products %}
+    <section class="grid">
+      {% for product in related_products %}
+        <article class="card">
+          <a href="{% url 'product_detail' product.product_id %}">
+            <img src="{{ product.main_image }}" alt="{{ product.product_name }}">
+          </a>
+          <div class="card-body">
+            <div class="muted">{{ product.category.category }}</div>
+            <h3 style="font-size:20px;margin:6px 0 4px;">
+              <a href="{% url 'product_detail' product.product_id %}">{{ product.product_name }}</a>
+            </h3>
+            <p class="muted">{{ product.description }}</p>
+            <div class="price">${{ product.price }}</div>
+            <form method="post" action="{% url 'add_to_cart' product.product_id %}">
+              {% csrf_token %}
+              <button class="primary" type="submit">Add to cart</button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
+    </section>
+  {% else %}
+    <p class="muted">No products linked to this crystal yet.</p>
+  {% endif %}
+</section>
+{% endblock %}
