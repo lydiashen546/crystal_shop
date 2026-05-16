@@ -1,0 +1,11 @@
+asgiref @ file:///C:/miniconda3/conda-bld/asgiref_1760342233031/work
+colorama @ file:///C:/ci_311/colorama_1676422310965/work
+Django @ file:///C:/b/abs_d8jy6px5xv/croot/django_1731616483677/work
+gunicorn==26.0.0
+iniconfig @ file:///C:/Users/task_176735684127429/croot/iniconfig_1767356944252/work
+packaging @ file:///C:/miniconda3/conda-bld/packaging_1761049096285/work
+pillow==12.2.0
+pluggy @ file:///C:/b/abs_dfec_m79vo/croot/pluggy_1733170145382/work
+Pygments @ file:///C:/miniconda3/conda-bld/pygments_1762431425708/work
+pytest @ file:///C:/miniconda3/conda-bld/pytest_1758125281680/work
+sqlparse @ file:///C:/miniconda3/conda-bld/sqlparse_1764240091927/work
